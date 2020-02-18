@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover"/>
+    <title>Title</title>
+    <!--<link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css"/>-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="../css/weui.min.css"/>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+</head>
+<body>
+<div class="container">
+    <div style="position: relative;  z-index: 1000; margin-top: 10px;">
+        <a id="scanQRCode" href="javascript:;" class="weui-btn weui-btn_primary">扫描条形码</a>
+        <a id="startRecord" href="javascript:;" class="weui-btn weui-btn_primary">开始录音</a>
+        <a id="stopRecord" href="javascript:;" class="weui-btn weui-btn_primary">结束录音</a>
+        <a id="playVoice" href="javascript:;" class="weui-btn weui-btn_primary">播放录音</a>
+        <a id="openLocation" href="javascript:;" class="weui-btn weui-btn_primary">查看位置</a>
+        <a id="getLocation" href="javascript:;" class="weui-btn weui-btn_primary">获取当前地理位置</a>
+        <a id="chooseImage" href="javascript:;" class="weui-btn weui-btn_primary">更换背景</a>
+        <a id="onMenuShareAppMessage" href="javascript:;" class="weui-btn weui-btn_primary">分享给朋友</a>
+
+    </div>
+
+    <div style="position: relative;  z-index: 99;margin: -440px 0 0 0;width: 100%;height: 100%;">
+        <!--<img id="sd" alt="请选择背景图" src="../img/beijing.jpg" style="width: 100%;height: 100%;"/>-->
+
+        <img id="sd" alt="请选择背景图" th:src="@{../img/beijing.jpg}" style="width: 100%;height: 100%;"/>
+    </div>
+
+
+</div>
+</body>
+
+<script type="text/javascript">
+    // <![CDATA[
+    $(function () {
+
+        var localIds = localStorage.getItem("localIds")
+        // alert(localIds);
+        // $("#sd").attr("src", localIds);
+
+        // alert(999999);
+        var signUrl = window.location.href.split('#')[0];
+        $.ajax({
+            url: "/user/test",
+            method: "post",
+            data: {
+                signUrl: signUrl
+            },
+            success: function (data) {
+                var list = JSON.parse(data.msg)
+                wx.config({
+                    debug: false,
+                    appId: 'wx53f704e68305cde5',
+                    timestamp: list.timestamp,
+                    nonceStr: list.noncestr,
+                    signature: list.signature,
+                    // jsApiList: list.jsApiList
+                    jsApiList: [
+                        'checkJsApi',
+                        'onMenuShareTimeline',
+                        'onMenuShareAppMessage',
+                        'onMenuShareQQ',
+                        'onMenuShareWeibo',
+                        'onMenuShareQZone',
+                        'hideMenuItems',
+                        'showMenuItems',
+                        'hideAllNonBaseMenuItem',
+                        'showAllNonBaseMenuItem',
+                        'translateVoice',
+                        'startRecord',
+                        'stopRecord',
+                        'onVoiceRecordEnd',
+                        'playVoice',
+                        'onVoicePlayEnd',
+                        'pauseVoice',
+                        'stopVoice',
+                        'uploadVoice',
+                        'downloadVoice',
+                        'chooseImage',
+                        'previewImage',
+                        'uploadImage',
+                        'downloadImage',
+                        'getNetworkType',
+                        'openLocation',
+                        'getLocation',
+                        'hideOptionMenu',
+                        'showOptionMenu',
+                        'closeWindow',
+                        'scanQRCode',
+                        'chooseWXPay',
+                        'openProductSpecificView',
+                        'addCard',
+                        'chooseCard',
+                        'openCard'
+                    ]
+                });
+                wx.ready(function () {
+                    // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，
+                    // 所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用
+                    // 的接口，则可以直接调用，不需要放在ready函数中。
+                    var img_url = "https://gss3.bdstatic.com/7Po3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike272%2C5%2C5%2C272%2C90/sign=0ad80e91ddc8a786aa27425c0660a258/d31b0ef41bd5ad6ef203ca818dcb39dbb7fd3ce6.jpg";
+                    console.log(img_url);
+                    var title = "标题哦";
+                    var link = window.location.href;
+                    // 分享到朋友圈
+                    wx.onMenuShareTimeline({
+                        imgUrl: img_url, // 分享图标
+                        link: link, // 分享链接
+                        desc: "这是分享到朋友圈的描述", // 分享描述
+                        title: title, // 分享标题,
+                        success: function () {
+                            // 用户确认分享后执行的回调函数
+                            // console.log("用户确认了");
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                            show_message("分享失败");
+                        }
+                    });
+                    // 分享给朋友
+                    wx.onMenuShareAppMessage({
+                        link: link, // 分享链接
+                        desc: "这是分享到朋友的描述", // 分享描述
+                        title: title, // 分享标题,
+                        imgUrl: img_url,
+                        success: function () {
+                            // console.log("分享给朋友");
+                            // 用户确认分享后执行的回调函数
+                        },
+                        cancel: function () {
+                            // 用户取消分享后执行的回调函数
+                        }
+                    });
+                });
+            }
+        });
+    });
+
+
+    $("#scanQRCode").click(function () {
+        wx.scanQRCode({
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                alert(result);
+            }
+        });
+    })
+
+    $("#startRecord").click(function () {
+        wx.startRecord();
+    })
+    $("#stopRecord").click(function () {
+        wx.stopRecord({
+            success: function (res) {
+                var localId = res.localId;
+                localStorage.setItem("test", localId);
+            }
+        });
+    })
+
+    $("#playVoice").click(function () {
+        var localId = localStorage.getItem("test");
+        wx.playVoice({
+            localId: localId // 需要播放的音频的本地ID，由stopRecord接口获得
+        });
+
+    })
+    // 查看位置
+    $("#openLocation").click(function () {
+        wx.openLocation({
+            latitude: 32, // 纬度，浮点数，范围为90 ~ -90
+            longitude: 118, // 经度，浮点数，范围为180 ~ -180。
+            name: '滁州', // 位置名
+            address: '滁州学院', // 地址详情说明
+            scale: 7, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+        });
+    })
+    // 获取当前地理位置
+    $("#getLocation").click(function () {
+        // alert("获取地理位置");
+
+        wx.getLocation({
+            type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+            success: function (res) {
+                // console.log(res)
+
+                var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed; // 速度，以米/每秒计
+                var accuracy = res.accuracy; // 位置精度
+
+                localStorage.setItem("latitude", latitude);
+                localStorage.setItem("longitude", longitude);
+            }
+        });
+        var latitude = localStorage.getItem("latitude");
+        var longitude = localStorage.getItem("longitude");
+        wx.openLocation({
+            latitude: latitude, // 纬度，浮点数，范围为90 ~ -90
+            longitude: longitude, // 经度，浮点数，范围为180 ~ -180。
+            name: '滁州', // 位置名
+            address: '滁州学院', // 地址详情说明
+            scale: 14, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+        });
+    })
+
+    // 拍照或从手机相册中选图接口
+    $("#chooseImage").click(function () {
+        wx.chooseImage({
+            count: 1, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                $("#sd").attr("src", localIds);
+                localStorage.setItem("localIds", localIds);
+
+            }
+        });
+    })
+
+    // 分享给朋友
+    // $("#onMenuShareAppMessage").click(function () {
+    //     alert(5555);
+    //     var localIds = localStorage.getItem("localIds");
+    //     var img_url = "https://gss3.bdstatic.com/7Po3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike272%2C5%2C5%2C272%2C90/sign=0ad80e91ddc8a786aa27425c0660a258/d31b0ef41bd5ad6ef203ca818dcb39dbb7fd3ce6.jpg";
+    //     var title = "标题哦";
+    //     var link = window.location.href;
+    //     wx.onMenuShareAppMessage({
+    //         link: link, // 分享链接
+    //         desc: "这是分享到朋友的描述", // 分享描述
+    //         title: title, // 分享标题,
+    //         imgUrl: img_url,
+    //         success: function () {
+    //             // console.log("分享给朋友");
+    //             // 用户确认分享后执行的回调函数
+    //         },
+    //         cancel: function () {
+    //             // 用户取消分享后执行的回调函数
+    //         }
+    //     });
+    //
+    // })
+
+
+    //]]>
+</script>
+<!--function f1() {-->
+<!--alert("ddd");-->
+<!--n = 999;-->
+<!--}-->
+<!--f1();-->
+<!--function f4() {-->
+<!--alert(n)-->
+<!--}-->
+<!--f4();-->
+
+
+<!--jsApiList: [-->
+<!--'checkJsApi',-->
+<!--'onMenuShareTimeline',-->
+<!--'onMenuShareAppMessage',-->
+<!--'onMenuShareQQ',-->
+<!--'onMenuShareWeibo',-->
+<!--'onMenuShareQZone',-->
+<!--'hideMenuItems',-->
+<!--'showMenuItems',-->
+<!--'hideAllNonBaseMenuItem',-->
+<!--'showAllNonBaseMenuItem',-->
+<!--'translateVoice',-->
+<!--'startRecord',-->
+<!--'stopRecord',-->
+<!--'onVoiceRecordEnd',-->
+<!--'playVoice',-->
+<!--'onVoicePlayEnd',-->
+<!--'pauseVoice',-->
+<!--'stopVoice',-->
+<!--'uploadVoice',-->
+<!--'downloadVoice',-->
+<!--'chooseImage',-->
+<!--'previewImage',-->
+<!--'uploadImage',-->
+<!--'downloadImage',-->
+<!--'getNetworkType',-->
+<!--'openLocation',-->
+<!--'getLocation',-->
+<!--'hideOptionMenu',-->
+<!--'showOptionMenu',-->
+<!--'closeWindow',-->
+<!--'scanQRCode',-->
+<!--'chooseWXPay',-->
+<!--'openProductSpecificView',-->
+<!--'addCard',-->
+<!--'chooseCard',-->
+<!--'openCard'-->
+<!--]-->
+
+
+</html>
